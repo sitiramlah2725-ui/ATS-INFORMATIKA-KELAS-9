@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informatika Quest - ATS Kelas 9 SMP Dhammāsoka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0288d1;
+            --primary-light: #03a9f4;
+            --accent: #00e676;
+            --accent-hover: #00c853;
+            --bg-start: #e0f7fa;
+            --bg-end: #b2ebf2;
+            --card-bg: #ffffff;
+            --text-dark: #1a237e;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(2, 136, 209, 0.2);
+            overflow: hidden;
+            border: 4px solid #4dd0e1;
+            position: relative;
+        }
+
+        /* Screen States */
+        .screen {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        h1 { font-size: 2rem; margin-bottom: 8px; }
+
+        .school-header {
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #455a64;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-tag {
+            background: #e0f2f1;
+            color: #00695c;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 2px dashed #004d40;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #80deea;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(2, 136, 209, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--accent);
+            color: #003300;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 5px 0 #009933;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #009933;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #009933;
+        }
+
+        /* HUD Header */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e0f7fa;
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 2px solid #b2ebf2;
+        }
+
+        .player-info {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        /* Reading / Image Context Box */
+        .reading-box {
+            background: #f1f8e9;
+            border-left: 5px solid #7cb342;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .reading-box h4 {
+            color: #33691e;
+            margin-bottom: 5px;
+        }
+
+        /* Question Section */
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 14px 18px;
+            border-radius: 14px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            background: #e0f7fa;
+            border-color: var(--primary-light);
+        }
+
+        .option-btn.selected {
+            background: #b2ebf2;
+            border-color: var(--primary);
+            font-weight: 800;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            background: #78909c;
+            box-shadow: 0 5px 0 #455a64;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #546e7a;
+            box-shadow: 0 7px 0 #455a64;
+        }
+
+        /* Result Screen */
+        .result-card {
+            background: #e0f7fa;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            border: 3px dashed var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-family: 'Fredoka One', cursive;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        .summary-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            font-weight: 700;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #80deea;
+        }
+
+        .stat-box.correct-box { color: var(--correct); }
+        .stat-box.wrong-box { color: var(--wrong); }
+
+        @media (max-width: 600px) {
+            .screen { padding: 20px; }
+            h1 { font-size: 1.6rem; }
+            .score-display { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- SCREEN 1: WELCOME / REGISTRATION -->
+    <div id="screen-welcome" class="screen active">
+        <div style="text-align: center;">
+            <div class="school-header">SMP DHAMMĀSOKA BANJARMASIN</div>
+            <span class="badge-tag">FASE D - KELAS IX GANJIL (INFORMATIKA)</span>
+            <h1>INFORMATIKA QUEST 💻🎮</h1>
+            <p style="color: #555; margin-bottom: 25px;">Asesmen Tengah Semester Informatika (Struktur Data & Konten Digital)</p>
+        </div>
+
+        <form id="start-form" onsubmit="startGame(event)">
+            <div class="input-group">
+                <label for="player-name">Nama Lengkap Siswa:</label>
+                <input type="text" id="player-name" placeholder="Masukkan nama kamu..." required>
+            </div>
+            <div class="input-group">
+                <label for="player-class">Kelas:</label>
+                <select id="player-class" required>
+                    <option value="">-- Pilih Kelas --</option>
+                    <option value="9-A">9-A</option>
+                    <option value="9-B">9-B</option>
+                    <option value="9-C">9-C</option>
+                    <option value="9-D">9-D</option>
+                </select>
+            </div>
+            <button type="submit" class="btn" style="margin-top: 10px;">MULAI PETUALANGAN 🚀</button>
+        </form>
+    </div>
+
+    <!-- SCREEN 2: QUIZ GAMEPLAY -->
+    <div id="screen-quiz" class="screen">
+        <div class="hud">
+            <div class="player-info">
+                👤 <span id="hud-name">Nama</span> (<span id="hud-class">Kelas</span>)
+            </div>
+            <div style="font-weight: 800; color: #00695c;" id="hud-counter">
+                Soal 1 / 50
+            </div>
+        </div>
+
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
+        <!-- Teks Bacaan / Kasus Informatika -->
+        <div id="reading-container" class="reading-box" style="display: none;">
+            <h4 id="reading-title">💡 Studi Kasus / Ilustrasi</h4>
+            <div id="reading-content"></div>
+        </div>
+
+        <div class="question-text" id="question-text">
+            Loading question...
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Options generated dynamically -->
+        </div>
+
+        <div class="nav-controls">
+            <button id="btn-prev" class="btn btn-secondary" onclick="prevQuestion()" style="visibility: hidden;">⬅ Kembali</button>
+            <button id="btn-next" class="btn" onclick="nextQuestion()">Lanjut ➡</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: RESULT REPORT -->
+    <div id="screen-result" class="screen">
+        <div style="text-align: center;">
+            <span class="badge-tag">HASIL ASESMEN TENGAH SEMESTER</span>
+            <h1>QUEST COMPLETED! 🎉</h1>
+        </div>
+
+        <div class="result-card">
+            <h3 id="result-player-name">Nama Siswa</h3>
+            <p id="result-player-class" style="color: #666; font-weight: 700;">Kelas</p>
+            
+            <div class="score-display" id="result-score">0</div>
+            <p id="result-feedback" style="font-weight: 800; font-size: 1.1rem; color: var(--primary);"></p>
+
+            <div class="summary-details">
+                <div class="stat-box correct-box">
+                    ✔️ Benar: <span id="stat-correct">0</span>
+                </div>
+                <div class="stat-box wrong-box">
+                    ❌ Salah: <span id="stat-wrong">0</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="restartGame()">🔄 Main Lagi / Ganti Siswa</button>
+    </div>
+</div>
+
+<script>
+    // DATA SOAL ASESMEN TENGAH SEMESTER (ATS) INFORMATIKA KELAS 9
+    const quizData = [
+        // Q1-Q10: Structure Data (Linear vs Nonlinear, Tree, Graph)
+        {
+            reading: "Sebuah aplikasi sekolah ingin menampilkan hubungan antarmurid dan kegiatan ekstrakurikuler. Setiap murid dapat mengikuti lebih dari satu kegiatan. Adapun setiap kegiatan juga dapat diikuti oleh banyak murid.",
+            readingTitle: "🌐 Kasus 1: Hubungan Ekskul Sekolah",
+            question: "1. Model struktur data yang paling tepat untuk menggambarkan kondisi tersebut adalah....",
+            options: [
+                "A. struktur data linear karena data murid dapat diurutkan berdasarkan nama kegiatan",
+                "B. struktur data linear karena setiap kegiatan memiliki daftar anggota yang berbeda-beda",
+                "C. struktur data nonlinear karena satu murid dapat terhubung dengan beberapa kegiatan",
+                "D. struktur data berurutan karena hubungan antarmurid dan kegiatan ekstrakurikuler dapat ditulis berdasarkan waktu pendaftaran"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: "Perhatikan dua contoh sistem berikut:<br>1. Daftar peringkat nilai murid yang disusun dari nilai tertinggi hingga terendah.<br>2. Peta rute antarkota yang menampilkan berbagai jalur perjalanan saling terhubung.",
+            readingTitle: "🗺️ Kasus 2: Sistem Komputer",
+            question: "2. Jika kedua sistem tersebut akan dimodelkan ke dalam komputer, sistem manakah yang lebih tepat direpresentasikan menggunakan struktur data nonlinear?",
+            options: [
+                "A. Sistem (2) karena setiap kota dapat terhubung dengan lebih dari satu jalur.",
+                "B. Sistem (1) karena data dapat disusun berdasarkan kategori tertentu.",
+                "C. Sistem (1) karena menunjukkan perbandingan nilai antarmurid.",
+                "D. Sistem (2) karena lokasi dapat ditulis berdasarkan urutan jarak."
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: "Dalam sebuah struktur tree, terdapat satu simpul utama yang berada di bagian paling atas. Satu simpul utama ini memiliki dua cabang ke bawah. Salah satu cabang memiliki dua simpul turunan, sedangkan cabang lainnya tidak mempunyai turunan lagi.",
+            readingTitle: "🌳 Kasus 3: Cabang Tree",
+            question: "3. Berdasarkan ilustrasi, sistem tersebut memiliki....",
+            options: [
+                "A. satu root, dua parent, dan dua leaf",
+                "B. dua root, satu parent, dan dua leaf",
+                "C. satu root, satu parent, dan tiga leaf",
+                "D. satu root, tiga parent, dan satu leaf"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "4. Dalam struktur data tree, hubungan antara parent dan child harus ditentukan dengan benar. Jika terjadi kesalahan dalam menetapkan hubungan tersebut, dampak yang mungkin terjadi adalah....",
+            options: [
+                "A. simpul utama tetap berada di posisi atas tanpa memengaruhi bagian lainnya",
+                "B. hubungan antarbagian menjadi tidak sesuai dengan pola yang seharusnya",
+                "C. jumlah simpul dalam diagram langsung berkurang secara otomatis",
+                "D. seluruh struktur otomatis berubah menjadi susunan data linear"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "Berdasarkan hierarki folder:<br><b>Proyek Kelas</b> (Utama)<br> ├── <b>Bab 1</b> ── <i>Pendahuluan.docx</i><br> └── <b>Bab 2</b> ── <i>Kesimpulan.docx</i>",
+            readingTitle: "📁 Kasus 5: Hierarki Folder",
+            question: "5. Pernyataan yang tepat sesuai dengan konsep struktur data tree adalah....",
+            options: [
+                "A. folder Proyek Kelas berperan sebagai leaf karena berada di tingkat paling atas",
+                "B. folder Bab 1 dan Bab 2 merupakan child dari folder Proyek Kelas",
+                "C. folder Bab 2 disebut root karena memiliki file di dalamnya",
+                "D. file Pendahuluan merupakan parent dari folder Bab 1"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "Percobaan 1: A terhubung dengan B & C; B-D; C-E.<br>Percobaan 2: A tetap ke C; C terhubung ke D; B tidak memiliki jalur ke D lagi.",
+            readingTitle: "📍 Kasus 6: Peta Jalur Graf",
+            question: "6. Berdasarkan perubahan tersebut, susunan keterhubungan yang paling tepat pada percobaan kedua adalah....",
+            options: [
+                "A. A-B, A-C, B-D",
+                "B. A-C, C-D, C-E",
+                "C. A-C, B-D, D-E",
+                "D. A-B, B-C, C-D"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "Pada sistem pesan: Andi dapat mengirim pesan langsung ke Budi, tetapi Budi tidak dapat membalas langsung ke Andi. Sementara itu, Citra dan Dinda dapat saling berkirim pesan secara dua arah.",
+            readingTitle: "💬 Kasus 7: Directed vs Undirected Graph",
+            question: "7. Manakah pernyataan yang benar berdasarkan ilustrasi tersebut?",
+            options: [
+                "A. Hubungan Andi-Budi merepresentasikan konsep directed graph, sedangkan Citra-Dinda termasuk undirected graph.",
+                "B. Hubungan Andi-Budi dan Citra-Dinda termasuk directed graph karena melibatkan pengiriman pesan.",
+                "C. Hubungan Andi-Budi mengilustrasikan struktur undirected graph, sedangkan Citra-Dinda termasuk directed graph.",
+                "D. Hubungan Andi-Budi dan Citra-Dinda termasuk undirected graph."
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: "Aturan urutan materi Bu Rani:<br>- Pengantar sebelum Latihan Dasar & Contoh Soal<br>- Contoh Soal sebelum Diskusi Kelas & Ujian Mini<br>- Latihan Dasar sebelum Ujian Mini",
+            readingTitle: "📚 Kasus 8: Alur Materi Pembelajaran",
+            question: "8. Urutan penyampaian materi yang memenuhi semua aturan di atas adalah....",
+            options: [
+                "A. Pengantar → Diskusi Kelas → Contoh Soal → Latihan Dasar → Ujian Mandiri",
+                "B. Pengantar → Latihan Dasar → Diskusi Kelas → Contoh Soal → Ujian Mandiri",
+                "C. Pengantar → Contoh Soal → Diskusi Kelas → Latihan Dasar → Ujian Mandiri",
+                "D. Pengantar → Diskusi Kelas → Latihan Dasar → Contoh Soal → Ujian Mandiri"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: "Seorang pengemudi antar-jemput sekolah harus menjemput murid. Jarak antartitik pada peta lintasan adalah 2 meter. Pengemudi harus memilih rute efisien terpendek.",
+            readingTitle: "🚌 Kasus 9: Optimization Path",
+            question: "9. Jarak terpendek yang harus dilewati petugas untuk mengantar semua murid ke sekolah adalah....",
+            options: ["A. 24 m", "B. 26 m", "C. 28 m", "D. 30 m"],
+            answer: 0 // A
+        },
+        {
+            reading: null,
+            question: "10. Perbedaan yang tepat antara fungsi Tree dan Graph adalah....",
+            options: [
+                "A. Tree: Memiliki satu simpul utama sebagai titik awal & jalur tidak berputar. | Graph: Mampu membentuk lintasan berulang dan tak terbatas pada satu simpul.",
+                "B. Tree: Memiliki lebih dari satu simpul utama. | Graph: Selalu tersusun dari satu simpul pusat.",
+                "C. Tree: Semua simpul pada tingkat sama. | Graph: Setiap simpul pasti memiliki satu simpul induk.",
+                "D. Tree: Hubungan antarsimpul selalu dua arah. | Graph: Hubungan antarsimpul selalu satu arah."
+            ],
+            answer: 0 // A
+        },
+
+        // Q11-Q20: Queue & Stack Concepts
+        {
+            reading: "Reno nomor antrean 12 di kantin. Karena temannya belum datang, Reno minta nomor 13 dilayani dulu tanpa mengubah sistem antrean Queue (FIFO).",
+            readingTitle: "🍱 Kasus 11: Antrean Kantin (Queue)",
+            question: "11. Apa yang kemungkinan terjadi pada sistem Queue?",
+            options: [
+                "A. Nomor 13 akan dipindahkan ke depan karena lebih siap.",
+                "B. Nomor 13 dapat langsung dilayani tanpa memengaruhi urutan antrean.",
+                "C. Sistem otomatis mengurutkan ulang berdasarkan kesiapan murid.",
+                "D. Nomor 13 harus tetap menunggu sampai nomor 12 atau Reno selesai dilayani."
+            ],
+            answer: 3 // D
+        },
+        {
+            reading: "Masuk berurutan: A, B, C, D, E. Setelah dokumen A selesai dicetak, masuk lagi dokumen F.",
+            readingTitle: "🖨️ Kasus 12: Antrean Pencetakan Dokumen",
+            question: "12. Urutan dokumen yang akan dicetak setelah A adalah....",
+            options: ["A. F, B, C, D, E", "B. B, C, D, E, F", "C. B, F, C, D, E", "D. F, E, D, C, B"],
+            answer: 1 // B
+        },
+        {
+            reading: "Di Bandara Bebrasland, 3 loket check-in meletakkan tas ke jalur vertikal. Petugas menekan tombol menggerakkan tas maju ke jalur horizontal.",
+            readingTitle: "🧳 Kasus 13: Bagasi Bandara",
+            question: "13. Manakah urutan keluarnya bagasi yang paling tepat berdasarkan konsep susunan jalur FIFO?",
+            options: [
+                "A. Opsi A (Susunan awal urutan Ana-Beni)",
+                "B. Opsi B (Susunan awal urutan Ciko-Dea)",
+                "C. Opsi C (Urutan sesuai kedatangan pertama dari setiap loket)",
+                "D. Opsi D (Susunan acak)"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: "Tabung berisi bola 1-12. Tombol R memutar tabung 180° (membalikkan stack), Tombol D mengeluarkan bola terbawah (pop).",
+            readingTitle: "🔮 Kasus 14: Mainan Tiga Tabung Juna",
+            question: "14. Posisi awal yang TIDAK MUNGKIN disusun menjadi urutan 1-12 adalah...",
+            options: [
+                "A. Tabung A (1,12,5,2), B (8,9,4,7), C (3,6,11,10)",
+                "B. Tabung A (1,12,5,4), B (8,9,7,2), C (3,6,10,11)",
+                "C. Tabung A (1,12,5,4), B (8,9,7,2), C (3,6,11,10)",
+                "D. Tabung A (1,2,3,5), B (8,9,7,4), C (12,11,10,6)"
+            ],
+            answer: 3 // D
+        },
+        {
+            reading: "Lala suka apel & jeruk (sisi kanan). Lili suka anggur & belimbing (sisi kanan). Buah yang tidak disukai dimasukkan ke sisi kiri teman.",
+            readingTitle: "🧺 Kasus 15: Keranjang Buah Lala & Lili",
+            question: "15. Urutan akhir buah yang sesuai adalah....",
+            options: [
+                "A. Lala: apel, jeruk, apel, apel, apel, belimbing... | Lili: belimbing...",
+                "B. Lala: jeruk, apel, apel, apel, apel, apel, jeruk, apel, jeruk | Lili: belimbing, belimbing, anggur, anggur, anggur...",
+                "C. Lala: jeruk, apel, apel, apel, jeruk, apel, jeruk, apel, jeruk | Lili: belimbing, belimbing, belimbing, anggur...",
+                "D. Lala: jeruk, apel, jeruk, apel... | Lili: anggur, anggur..."
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "Prioritas: Ben (tertua) > Alex > Bob = Bian (termuda). Datang duluan: Bob & Alex, lalu Ben, terakhir Bian.",
+            readingTitle: "🍲 Kasus 16: Antrean Rumah Makan Prioritas",
+            question: "16. Urutan pelayanan antrean yang benar sesuai aturan prioritas usia adalah....",
+            options: ["A. Ben, Bob, Alex, Bian", "B. Ben, Bob, Bian, Alex", "C. Ben, Alex, Bian, Bob", "D. Ben, Alex, Bob, Bian"],
+            answer: 3 // D
+        },
+        {
+            reading: "5 boneka salju berbaris dari kiri ke kanan. Boneka paling kiri mengambil topi paling atas (Stack/LIFO).",
+            readingTitle: "⛄ Kasus 17: Boneka Salju & Topi",
+            question: "17. Pasangan tumpukan topi yang pas sesuai ukuran boneka dari kiri ke kanan adalah....",
+            options: [
+                "A. Tumpukan A (Urutan ukuran dari atas ke bawah sesuai kiri ke kanan)",
+                "B. Tumpukan B",
+                "C. Tumpukan C",
+                "D. Tumpukan D"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: "Berang-berang mengantre di toko permen. Penjaga memberikan permen yang posisinya paling dekat dengan berang-berang terdepan.",
+            readingTitle: "🍭 Kasus 18: Toko Permen Berang-berang",
+            question: "18. Siapakah yang akan mendapatkan permen lolipop merah berbentuk segitiga?",
+            options: ["A. Flo", "B. Debi", "C. Sindi", "D. Cahya"],
+            answer: 1 // B
+        },
+        {
+            reading: "Antrean awal Queue: Arya → Beni → Citra → Dimas → Shela → Farhan.<br>Proses: (1) Arya keluar, (2) Gina masuk belakang, (3) 2 murid terdepan keluar, (4) Arya masuk lagi di belakang.",
+            readingTitle: "📸 Kasus 19: Foto Bersama (Queue)",
+            question: "19. Urutan barisan dari depan ke belakang setelah semua proses adalah....",
+            options: [
+                "A. Shela → Farhan → Gina → Arya → Citra",
+                "B. Dimas → Shela → Farhan → Gina → Arya",
+                "C. Dimas → Shela → Farhan → Arya → Gina",
+                "D. Citra → Dimas → Shela → Farhan → Gina"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "Antrean awal: Raka → Sinta → Tio → Vina.<br>Proses: (1) 2 pertama selesai, (2) Wulan & Yoga masuk, (3) 1 lagi selesai, (4) Zara masuk, (5) 1 terdepan batalkan antrean.",
+            readingTitle: "🖥️ Kasus 20: Konsultasi Online",
+            question: "20. Urutan antrean sekarang dari depan ke belakang adalah....",
+            options: ["A. Yoga → Wulan → Zara", "B. Wulan → Yoga → Zara", "C. Vina → Wulan → Zara", "D. Yoga → Wulan → Zara"],
+            answer: 1 // B
+        },
+
+        // Q21-Q35: Digital Content & Literacy
+        {
+            reading: null,
+            question: "21. Guru menjelaskan materi sambil menunjuk poster dinding dan membagikan buku paket. Pernyataan paling tepat menggambarkan situasi tersebut adalah....",
+            options: [
+                "A. Hanya buku paket yang termasuk konten karena berisi tulisan dan gambar.",
+                "B. Poster di dinding bukan konten karena tidak digital.",
+                "C. Penjelasan guru, poster dinding, dan buku paket semuanya adalah konten.",
+                "D. Tidak ada situasi yang menunjukkan sebuah konten."
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "22. Perbedaan mendasar antara konten tradisional dan konten digital adalah....",
+            options: [
+                "A. Konten digital tidak memerlukan perencanaan.",
+                "B. Konten digital hanya bisa dilihat melalui internet.",
+                "C. Konten tradisional lebih cepat sampai ke audiens.",
+                "D. Konten tradisional bersifat satu arah, sedangkan konten digital memungkinkan komunikasi dua arah."
+            ],
+            answer: 3 // D
+        },
+        {
+            reading: null,
+            question: "23. Infografik tentang 'Cara Menghemat Kuota Internet bagi Pelajar' termasuk jenis konten....",
+            options: ["A. konten hiburan", "B. konten edukasi", "C. konten persuasif", "D. konten promosi"],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "24. Kombinasi elemen digital yang paling efektif untuk menjelaskan siklus air agar mudah dipahami adalah....",
+            options: [
+                "A. foto statis tanpa keterangan teks",
+                "B. rekaman suara saja",
+                "C. kombinasi video animasi dengan narasi (audio) dan fitur kuis interaktif",
+                "D. teks panjang yang mendetail"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "25. Penggunaan format video pendek dengan tambahan subtitle (teks) dan musik latar dianggap efisien karena....",
+            options: [
+                "A. membangun suasana dan memastikan pesan tersampaikan meski audiens mematikan suara",
+                "B. mengganti elemen interaktivitas",
+                "C. menghindari pencarian data fakta",
+                "D. memperpanjang durasi hingga 1 jam"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: "Seorang pembuat konten melihat tren viral 'diet ekstrem tanpa medis'. Ia ingin membuat konten berbasis informasi yang bertanggung jawab.",
+            readingTitle: "💡 Kasus 26: Tren Viral Medsos",
+            question: "26. Tindakan yang paling mencerminkan tujuan positif dan membangun pengetahuan adalah....",
+            options: [
+                "A. Mengunggah video tantangan dengan disclaimer risiko.",
+                "B. Membuat video membedah risiko kesehatan berdasarkan data medis dan menyarankan ahli gizi.",
+                "C. Menghindari pembuatannya sama sekali.",
+                "D. Membuat video parodi menertawakan orang yang ikut diet."
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "\"Baru saja terjadi kemacetan total di Jalan Sudirman karena perbaikan jalan. Sebaiknya pemerintah lebih becus dalam mengatur jadwal proyek agar tidak merugikan rakyat kecil!\"",
+            readingTitle: "📰 Kasus 27: Narasi Berita",
+            question: "27. Perubahan paling mendasar agar narasi di atas menjadi konten informasi yang bertanggung jawab adalah....",
+            options: [
+                "A. mengganti kata 'pemerintah' dengan instansi spesifik",
+                "B. menambahkan foto kemacetan yang dramatis",
+                "C. mengubah bahasa provokatif menjadi objektif dan menambah rute alternatif",
+                "D. menghapus bagian 'merugikan rakyat kecil'"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "28. Media yang paling cocok digunakan untuk menyebarkan konten edukatif kepada kalangan anak-anak adalah....",
+            options: [
+                "A. platform berbagi video dengan konten visual dan audio",
+                "B. platform menulis pesan singkat",
+                "C. platform pengelola situs web",
+                "D. platform jejaring sosial untuk status"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: null,
+            question: "29. Urutan proses perencanaan konten digital yang paling logis dan sistematis adalah....",
+            options: [
+                "A. produksi → menentukan audiens → membuat naskah → unggah",
+                "B. memilih format → menulis naskah → produksi → menentukan tujuan",
+                "C. membuat storyboard → menentukan format → mencari ide → produksi",
+                "D. menentukan ide dan tujuan → mengenali audiens → memilih format → menulis naskah → storyboard"
+            ],
+            answer: 3 // D
+        },
+        {
+            reading: null,
+            question: "30. Strategi pengenalan audiens paling tepat untuk menjelaskan 'Bahaya Phishing' kepada audiens lansia adalah....",
+            options: [
+                "A. Menggunakan istilah teknis seperti script injection.",
+                "B. Menggunakan bahasa sehari-hari yang komunikatif dan menjelaskan istilah asing secara rinci.",
+                "C. Menampilkan infografik data padat 5 detik.",
+                "D. Menggunakan tempo bicara cepat dengan musik hits."
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "31. Jenis konten paling tepat untuk menyajikan data dampak sampah plastik secara ringkas dan visual adalah....",
+            options: [
+                "A. rekaman audio panjang tanpa visual",
+                "B. desain visual berupa infografik",
+                "C. tulisan artikel panjang",
+                "D. video tanpa penjelasan"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "32. Alika merekam podcast tetapi hasilnya bising. Langkah perbaikan kualitas yang tepat adalah....",
+            options: [
+                "A. mengedit rekaman dengan memotong bagian bising & memperbaikinya via aplikasi audio",
+                "B. mengunggah apa adanya",
+                "C. menambahkan musik keras",
+                "D. mengganti topik pembahasan"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: null,
+            question: "33. Arum menggunakan gambar dari internet untuk poster tanpa mencantumkan sumber. Penilaian etika yang tepat adalah....",
+            options: [
+                "A. Sudah tepat karena bebas di internet.",
+                "B. Sudah tepat untuk edukasi.",
+                "C. Belum tepat, karena setiap karya memiliki pencipta sehingga wajib menghargai pembuatnya.",
+                "D. Belum tepat, gambar harus diubah warnanya dulu."
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "34. Poster infografik memiliki kalimat terlalu panjang dan tata letak padat. Perbaikan yang tepat adalah....",
+            options: [
+                "A. menyederhanakan kalimat dan memperbaiki tata letak agar informasi jelas",
+                "B. menambahkan contoh pada tiap bagian",
+                "C. memperbesar ukuran teks saja",
+                "D. mengganti warna tanpa mengubah struktur"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: null,
+            question: "35. Fungsi media sosial dalam diseminasi konten edukasi lingkungan adalah....",
+            options: [
+                "A. menyediakan format beragam",
+                "B. menjadi sarana penyebaran informasi secara luas melalui fitur berbagi dan interaksi pengguna",
+                "C. membantu desain visual",
+                "D. memantau statistik semata"
+            ],
+            answer: 1 // B
+        },
+
+        // Q36-Q50: Deep Learning & Media Content Analysis
+        {
+            reading: "Strategi memperluas jangkauan konten:<br>1. Waktu unggah pas<br>2. Efek visual<br>3. Bagi ke medsos<br>4. Hashtag relevan<br>5. Potong video",
+            readingTitle: "📈 Kasus 36: Diseminasi Konten",
+            question: "36. Kombinasi angka yang tepat untuk memperluas jangkauan adalah....",
+            options: ["A. 1), 2), dan 5)", "B. 1), 3), dan 4)", "C. 2), 3), dan 5)", "D. 2), 4), dan 5)"],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "37. Strategi diseminasi konten edukasi bahaya merokok untuk sasaran remaja & dewasa adalah....",
+            options: [
+                "A. mengunggah pada platform yang banyak digunakan remaja/dewasa serta membagikannya di waktu yang tepat",
+                "B. fokus ke visual tanpa pikirkan penyebaran",
+                "C. menambah gambar animasi saja",
+                "D. menggunakan bahasa sangat formal"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: null,
+            question: "38. Platform yang paling tepat untuk menyebarkan artikel panjang tentang privasi data digital adalah....",
+            options: ["A. X (Twitter)", "B. LinkedIn / WordPress", "C. Instagram", "D. TikTok"],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "39. Perbaikan judul video YouTube 'Tip Penting!!!' agar mudah ditemukan audiens pelajar adalah....",
+            options: [
+                "A. mempertahankan judul awal",
+                "B. menggunakan judul umum",
+                "C. menambah tanda seru",
+                "D. mengganti judul lebih spesifik, misal 'Cara Menghemat Kuota Internet untuk Pelajar'"
+            ],
+            answer: 3 // D
+        },
+        {
+            reading: null,
+            question: "40. Konten edukasi begadang dianggap hiburan oleh penonton. Langkah perbaikan kreator adalah....",
+            options: [
+                "A. menganalisis komentar & respons audiens untuk mengetahui bagian pesan yang kurang jelas",
+                "B. menambah efek visual",
+                "C. mengunggah ulang tanpa ubah",
+                "D. memotong durasi"
+            ],
+            answer: 0 // A
+        },
+        {
+            reading: null,
+            question: "41. Raka ingin membuat konten edukasi keamanan data pribadi. Langkah pertama yang tepat adalah....",
+            options: [
+                "A. Memilih musik viral",
+                "B. Menentukan tujuan dan sasaran audiens",
+                "C. Mengunggah konten sebanyak-banyaknya",
+                "D. Menambahkan banyak efek animasi"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: "Poster 'Bahaya Berita Hoaks' menarik tapi terlalu banyak tulisan dan jenis huruf.",
+            readingTitle: "🛑 Kasus 42: Visual Poster Hoaks",
+            question: "42. Perbaikan yang paling tepat adalah....",
+            options: [
+                "A. Menambahkan lebih banyak gambar",
+                "B. Menggunakan lebih banyak jenis font",
+                "C. Menyederhanakan teks dan memperbaiki hierarki visual",
+                "D. Menghilangkan seluruh gambar"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: "Tampilan Feed Medsos:<br>A. Good Vibes Only<br>B. Tips Belajar Efektif di Rumah<br>C. Jangan Lupa Jaga Kesehatan Mental<br>D. Hidup itu drama.",
+            readingTitle: "📸 Kasus 43: Kualitas Feed Medsos",
+            question: "43. Konten manakah yang paling tepat sebagai contoh konten digital edukatif berkualitas?",
+            options: ["A. Konten A", "B. Konten B", "C. Konten C", "D. Konten D"],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "44. Dina membuat video tutorial 'Cara Membuat Presentasi Menarik'. Hal paling penting diperhatikan agar mudah dipahami adalah....",
+            options: [
+                "A. Menggunakan sebanyak mungkin efek",
+                "B. Menggunakan bahasa yang jelas dan struktur informasi yang runtut",
+                "C. Menggunakan musik dengan volume sangat keras",
+                "D. Membuat video selama mungkin"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "45. Agar thumbnail video YouTube efektif dan menarik penonton, tindakan yang paling tepat adalah....",
+            options: [
+                "A. Menghilangkan tulisan",
+                "B. Menambahkan warna mencolok tanpa aturan",
+                "C. Menggunakan gambar yang relevan dan teks singkat yang mudah dibaca",
+                "D. Menambahkan logo aplikasi lain"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "46. Sebelum mengunggah konten, siswa memeriksa apakah isinya menyinggung orang lain. Sikap ini menunjukkan penerapan....",
+            options: ["A. Etika digital", "B. Kompresi data", "C. Pemrograman", "D. Pengolahan angka"],
+            answer: 0 // A
+        },
+        {
+            reading: "Unggahan meminta pengguna mengirim password via tautan (Phishing).",
+            readingTitle: "⚠️ Kasus 47: Keamanan Siber",
+            question: "47. Tindakan yang paling tepat adalah....",
+            options: [
+                "A. Segera mengklik tautan",
+                "B. Membagikan informasi",
+                "C. Memeriksa kebenaran informasi dan tidak memberikan data pribadi",
+                "D. Mengirimkan password"
+            ],
+            answer: 2 // C
+        },
+        {
+            reading: null,
+            question: "48. Video edukasi memiliki informasi benar tapi pembuka terlalu panjang. Perbaikan yang pas adalah....",
+            options: [
+                "A. Menghilangkan seluruh informasi",
+                "B. Membuat pembuka yang singkat, menarik, dan sesuai dengan tujuan konten",
+                "C. Menambahkan tulisan padat",
+                "D. Membuat video tanpa tujuan"
+            ],
+            answer: 1 // B
+        },
+        {
+            reading: null,
+            question: "49. Agar konten infografis berkualitas, pembuat konten harus menghubungkan informasi, visual, dan pesan utama secara....",
+            options: ["A. Acak", "B. Berlebihan", "C. Logis dan saling mendukung", "D. Terpisah"],
+            answer: 2 // C
+        },
+        {
+            reading: "Pesan ancaman: 'Akun medsos kamu akan diblokir jika tidak kirim password ke bit.ly/akun-blokir'.",
+            readingTitle: "🔒 Kasus 50: Penipuan Akun",
+            question: "50. Tindakan paling tepat berdasarkan situasi tersebut adalah....",
+            options: [
+                "A. Segera mengklik tautan",
+                "B. Membagikan informasi agar teman tahu",
+                "C. Memeriksa kebenaran informasi dan tidak memberikan data pribadi",
+                "D. Mengirimkan password untuk memastikan akun tetap aktif"
+            ],
+            answer: 2 // C
+        }
+    ];
+
+    // State Variables
+    let playerName = "";
+    let playerClass = "";
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // OPSIONAL: Masukkan Web App URL dari Google Apps Script untuk autosave nilai
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXUBTFYwqTtsUG7phuxaUzt801DFU5WK3kdq7vliURwn_u_3y3qtdtaXMpJMmaPD4UvA/exec";
+
+    // DOM Elements
+    const screenWelcome = document.getElementById('screen-welcome');
+    const screenQuiz = document.getElementById('screen-quiz');
+    const screenResult = document.getElementById('screen-result');
+
+    // Start Game Handler
+    function startGame(e) {
+        e.preventDefault();
+        playerName = document.getElementById('player-name').value.trim();
+        playerClass = document.getElementById('player-class').value;
+
+        if(!playerName || !playerClass) return;
+
+        // Set HUD Data
+        document.getElementById('hud-name').innerText = playerName;
+        document.getElementById('hud-class').innerText = playerClass;
+
+        // Switch Screen
+        screenWelcome.classList.remove('active');
+        screenQuiz.classList.add('active');
+
+        // Render First Question
+        loadQuestion();
+    }
+
+    // Load Question Content
+    function loadQuestion() {
+        const qData = quizData[currentQuestionIndex];
+
+        // Update HUD & Progress
+        document.getElementById('hud-counter').innerText = `Soal ${currentQuestionIndex + 1} / ${quizData.length}`;
+        const progressPercent = ((currentQuestionIndex + 1) / quizData.length) * 100;
+        document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+        // Reading Text Box
+        const readingContainer = document.getElementById('reading-container');
+        if(qData.reading) {
+            readingContainer.style.display = 'block';
+            document.getElementById('reading-title').innerText = qData.readingTitle || "💡 Studi Kasus / Ilustrasi";
+            document.getElementById('reading-content').innerHTML = qData.reading;
+        } else {
+            readingContainer.style.display = 'none';
+        }
+
+        // Question & Options
+        document.getElementById('question-text').innerText = qData.question;
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        qData.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            if(userAnswers[currentQuestionIndex] === index) {
+                btn.classList.add('selected');
+            }
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(index);
+            optionsContainer.appendChild(btn);
+        });
+
+        // Control Buttons State
+        document.getElementById('btn-prev').style.visibility = currentQuestionIndex === 0 ? 'hidden' : 'visible';
+        
+        if(currentQuestionIndex === quizData.length - 1) {
+            document.getElementById('btn-next').innerText = "Selesai 🏁";
+        } else {
+            document.getElementById('btn-next').innerText = "Lanjut ➡";
+        }
+    }
+
+    // Select Option Handler
+    function selectOption(index) {
+        userAnswers[currentQuestionIndex] = index;
+        loadQuestion();
+    }
+
+    // Navigation Controls
+    function prevQuestion() {
+        if(currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if(userAnswers[currentQuestionIndex] === null) {
+            alert("Pilih salah satu jawaban terlebih dahulu!");
+            return;
+        }
+
+        if(currentQuestionIndex < quizData.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    // Calculate & Show Result
+    function showResult() {
+        screenQuiz.classList.remove('active');
+        screenResult.classList.add('active');
+
+        let correctCount = 0;
+        userAnswers.forEach((ans, index) => {
+            if(ans === quizData[index].answer) {
+                correctCount++;
+            }
+        });
+
+        const wrongCount = quizData.length - correctCount;
+        const finalScore = Math.round((correctCount / quizData.length) * 100);
+
+        // Display Data
+        document.getElementById('result-player-name').innerText = playerName;
+        document.getElementById('result-player-class').innerText = `Kelas: ${playerClass}`;
+        document.getElementById('result-score').innerText = finalScore;
+        document.getElementById('stat-correct').innerText = `${correctCount} Soal`;
+        document.getElementById('stat-wrong').innerText = `${wrongCount} Soal`;
+
+        // Feedback Message
+        const feedbackEl = document.getElementById('result-feedback');
+        if(finalScore >= 85) {
+            feedbackEl.innerText = "🌟 EXCELLENT! Pemahaman Informatika kamu luar biasa!";
+            feedbackEl.style.color = "#0288d1";
+        } else if(finalScore >= 70) {
+            feedbackEl.innerText = "👍 GREAT JOB! Hasil pengerjaan yang baik!";
+            feedbackEl.style.color = "#009933";
+        } else {
+            feedbackEl.innerText = "💪 KEEP LEARNING! Tingkatkan terus logika & etika digital kamu!";
+            feedbackEl.style.color = "#e74c3c";
+        }
+
+        // --- OPTIONAL: SINKRONISASI KE GOOGLE SPREADSHEET ---
+        if(SCRIPT_URL && SCRIPT_URL !== "") {
+            const payload = {
+                nama: playerName,
+                kelas: playerClass,
+                skor: finalScore,
+                benar: correctCount,
+                salah: wrongCount
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => console.log("Skor terkirim ke Spreadsheet"))
+            .catch(err => console.error("Gagal kirim skor:", err));
+        }
+    }
+
+    // Restart Game
+    function restartGame() {
+        currentQuestionIndex = 0;
+        userAnswers = new Array(quizData.length).fill(null);
+        document.getElementById('start-form').reset();
+        
+        screenResult.classList.remove('active');
+        screenWelcome.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
